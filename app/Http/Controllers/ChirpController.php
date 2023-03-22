@@ -39,7 +39,7 @@ class ChirpController extends Controller
                 $image_name = md5(rand(1000, 10000));
                 $ext = strtolower($file->getClientOriginalExtension());
                 $image_fullName = $image_name . '.' . $ext;
-                $upload_path = 'storage/images';
+                $upload_path = 'storage/images/';
                 $image_url = $upload_path . $image_fullName;
                 $file->move($upload_path, $image_fullName);
                 $image[] = $image_url;

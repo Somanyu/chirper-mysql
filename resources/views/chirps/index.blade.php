@@ -10,13 +10,13 @@
             <x-input-error :messages="$errors->get('message')" class="mt-2" />
             <!-- Image Upload -->
             <div class="mt-4">
-                <x-input-label for="image" :value="__('Profile Image')" />
+                <x-input-label for="image" :value="__('Upload Post')" />
                 <input id="image" class="block w-full text-sm text-slate-500
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-full file:border-0
                 file:text-sm file:font-semibold
-                file:bg-slate-50 file:text-slate-700
-                hover:file:bg-slate-100"  type="file" name="images[]" multiple/>
+                file:bg-blue-50 file:text-slate-700
+                hover:file:bg-slate-300"  type="file" name="images[]" multiple/>
                 <x-input-error :messages="$errors->get('image')" class="mt-2" />
             </div>
             <x-primary-button class="mt-4">{{ __('Chirp') }}</x-primary-button>
@@ -59,6 +59,11 @@
                                     </x-slot>
                                 </x-dropdown>
                             @endif
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-5">
+                            @foreach(explode('|', $chirp->images) as $image)
+                                <img class="max-w-full h-auto rounded-lg" src="{{ asset($image) }}" alt="Chirp Image">
+                            @endforeach
                         </div>
                         <p class="mt-4 text-lg text-gray-900">{{ $chirp->message }}</p>
                     </div>
