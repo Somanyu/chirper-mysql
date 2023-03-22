@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Chirp;
 use Illuminate\Http\Request;
-use Illuminate\View\View; 
+use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 
 class ChirpController extends Controller
 {
@@ -32,11 +33,25 @@ class ChirpController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'message' => 'required|string|max:255',
+        $image = array();
+        if ($files = $request->file('images')) {
+            foreach ($files as $file) {
+                $image_name = md5(rand(1000, 10000));
+                $ext = strtolower($file->getClientOriginalExtension());
+                $image_fullName = $image_name . '.' . $ext;
+                $upload_path = 'storage/images';
+                $image_url = $upload_path . $image_fullName;
+                $file->move($upload_path, $image_fullName);
+                $image[] = $image_url;
+            }
+        }
+
+        $user_id = Auth::id();
+        $request->user()->chirps()->create([
+            'images' => implode('|', $image),
+            'message' => $request->message,
         ]);
 
-        $request->user()->chirps()->create($validated);
         return redirect(route('chirps.index'));
     }
 
