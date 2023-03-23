@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ChirpController extends Controller
 {
@@ -46,7 +47,6 @@ class ChirpController extends Controller
             }
         }
 
-        $user_id = Auth::id();
         $request->user()->chirps()->create([
             'images' => implode('|', $image),
             'message' => $request->message,
@@ -97,6 +97,20 @@ class ChirpController extends Controller
     public function destroy(Chirp $chirp): RedirectResponse
     {
         $this->authorize('delete', $chirp);
+
+
+        if ($chirp->images) {
+            foreach (explode('|', $chirp->images) as $image) {
+                $url = asset($image);
+                if (Storage::exists(str_replace('storage', 'public', $image))) {
+                    // dd($url);
+                    Storage::delete(str_replace('storage', 'public', $image));
+                } else {
+                    dd('Does not exist');
+                }
+            }
+        }
+        
 
         $chirp->delete();
 
