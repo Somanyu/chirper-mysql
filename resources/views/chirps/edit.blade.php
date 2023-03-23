@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="max-w-2xl mx-auto p-4 sm:p-6 lg:p-8">
-        <form method="POST" action="{{ route('chirps.update', $chirp) }}">
+        <form method="POST" action="{{ route('chirps.update', $chirp) }}" enctype="multipart/form-data">
             @csrf
             @method('patch')
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4 my-5">

@@ -82,11 +82,40 @@ class ChirpController extends Controller
     {
         $this->authorize('update', $chirp);
 
-        $validated = $request->validate([
-            'message' => 'required|string|max:255',
-        ]);
 
-        $chirp->update($validated);
+        // Delete the old images from storage
+        if ($chirp->images) {
+            foreach (explode('|', $chirp->images) as $image) {
+                $url = asset($image);
+                if (Storage::exists(str_replace('storage', 'public', $image))) {
+                    // dd($url);
+                    Storage::delete(str_replace('storage', 'public', $image));
+                } else {
+                    dd('Does not exist');
+                }
+            }
+        }
+
+
+        // Save the new images to storage
+        $image = array();
+        if ($files = $request->file('images')) {
+            foreach ($files as $file) {
+                $image_name = md5(rand(1000, 10000));
+                $ext = strtolower($file->getClientOriginalExtension());
+                $image_fullName = $image_name . '.' . $ext;
+                $upload_path = 'storage/images/';
+                $image_url = $upload_path . $image_fullName;
+                $file->move($upload_path, $image_fullName);
+                $image[] = $image_url;
+            }
+        }
+        // dd($image);
+
+        $chirp->update([
+            'images' => implode('|', $image),
+            'message' => $request->message,
+        ]);
 
         return redirect(route('chirps.index'));
     }
