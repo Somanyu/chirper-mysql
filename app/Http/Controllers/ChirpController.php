@@ -34,7 +34,7 @@ class ChirpController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $image = array();
+        $images = array();
         if ($files = $request->file('images')) {
             foreach ($files as $file) {
                 $image_name = md5(rand(1000, 10000));
@@ -43,14 +43,25 @@ class ChirpController extends Controller
                 $upload_path = 'storage/images/';
                 $image_url = $upload_path . $image_fullName;
                 $file->move($upload_path, $image_fullName);
-                $image[] = $image_url;
+                $images[] = $image_url;
             }
         }
 
-        $request->user()->chirps()->create([
-            'images' => implode('|', $image),
+        // $request->user()->chirps()->create([
+            // 'images' => implode('|', $image),
+            // 'message' => $request->message,
+        // ]);
+
+        $chirps = $request->user()->chirps()->create([
             'message' => $request->message,
         ]);
+
+        foreach ($images as $image) {
+            $chirps->images()->create([
+                'filename' => $image,
+            ]);
+        };
+
 
         return redirect(route('chirps.index'));
     }

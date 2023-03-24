@@ -4,8 +4,8 @@
             @csrf
             @method('patch')
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4 my-5">
-                @foreach(explode('|', $chirp->images) as $image)
-                    <img class="max-w-full h-auto rounded-lg" src="{{ asset($image) }}" alt="Chirp Image">
+                @foreach($chirp->images as $image)
+                    <img class="max-w-full h-auto rounded-lg" src="{{ asset($image->filename) }}" alt="Chirp Image">
                 @endforeach
             </div>
             <textarea

@@ -61,8 +61,8 @@
                             @endif
                         </div>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-5">
-                            @foreach(explode('|', $chirp->images) as $image)
-                                <img class="max-w-full h-auto rounded-lg" src="{{ asset($image) }}" alt="Chirp Image">
+                            @foreach($chirp->images as $image)
+                                <img class="max-w-full h-auto rounded-lg" src="{{ $image->filename }}" alt="Chirp Image">
                             @endforeach
                         </div>
                         <p class="mt-4 text-lg text-gray-900">{{ $chirp->message }}</p>
