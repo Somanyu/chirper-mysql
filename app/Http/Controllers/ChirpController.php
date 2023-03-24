@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Chirp;
+use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -95,36 +96,35 @@ class ChirpController extends Controller
 
 
         // Delete the old images from storage
-        if ($chirp->images) {
-            foreach (explode('|', $chirp->images) as $image) {
-                $url = asset($image);
-                if (Storage::exists(str_replace('storage', 'public', $image))) {
-                    // dd($url);
-                    Storage::delete(str_replace('storage', 'public', $image));
-                } else {
-                    dd('Does not exist');
-                }
-            }
-        }
-
+        // if ($chirp->images) {
+        //     foreach (explode('|', $chirp->images) as $image) {
+        //         $url = asset($image);
+        //         if (Storage::exists(str_replace('storage', 'public', $image))) {
+        //             // dd($url);
+        //             Storage::delete(str_replace('storage', 'public', $image));
+        //         } else {
+        //             dd('Does not exist');
+        //         }
+        //     }
+        // }
 
         // Save the new images to storage
-        $image = array();
-        if ($files = $request->file('images')) {
-            foreach ($files as $file) {
-                $image_name = md5(rand(1000, 10000));
-                $ext = strtolower($file->getClientOriginalExtension());
-                $image_fullName = $image_name . '.' . $ext;
-                $upload_path = 'storage/images/';
-                $image_url = $upload_path . $image_fullName;
-                $file->move($upload_path, $image_fullName);
-                $image[] = $image_url;
-            }
-        }
+        // $image = array();
+        // if ($files = $request->file('images')) {
+        //     foreach ($files as $file) {
+        //         $image_name = md5(rand(1000, 10000));
+        //         $ext = strtolower($file->getClientOriginalExtension());
+        //         $image_fullName = $image_name . '.' . $ext;
+        //         $upload_path = 'storage/images/';
+        //         $image_url = $upload_path . $image_fullName;
+        //         $file->move($upload_path, $image_fullName);
+        //         $image[] = $image_url;
+        //     }
+        // }
         // dd($image);
 
+
         $chirp->update([
-            'images' => implode('|', $image),
             'message' => $request->message,
         ]);
 
@@ -139,17 +139,17 @@ class ChirpController extends Controller
         $this->authorize('delete', $chirp);
 
 
-        if ($chirp->images) {
-            foreach (explode('|', $chirp->images) as $image) {
-                $url = asset($image);
-                if (Storage::exists(str_replace('storage', 'public', $image))) {
-                    // dd($url);
-                    Storage::delete(str_replace('storage', 'public', $image));
-                } else {
-                    dd('Does not exist');
-                }
-            }
-        }
+        // if ($chirp->images) {
+        //     foreach (explode('|', $chirp->images) as $image) {
+        //         $url = asset($image);
+        //         if (Storage::exists(str_replace('storage', 'public', $image))) {
+        //             // dd($url);
+        //             Storage::delete(str_replace('storage', 'public', $image));
+        //         } else {
+        //             dd('Does not exist');
+        //         }
+        //     }
+        // }
         
 
         $chirp->delete();
