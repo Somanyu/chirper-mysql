@@ -139,29 +139,17 @@ class ChirpController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Chirp $chirp): RedirectResponse
+    public function destroy(Chirp $chirp, Image $image): RedirectResponse
     {
         $this->authorize('delete', $chirp);
 
-
-        // if ($chirp->images) {
-        //     foreach (explode('|', $chirp->images) as $image) {
-        //         $url = asset($image);
-        //         if (Storage::exists(str_replace('storage', 'public', $image))) {
-        //             // dd($url);
-        //             Storage::delete(str_replace('storage', 'public', $image));
-        //         } else {
-        //             dd('Does not exist');
-        //         }
-        //     }
-        // }
-
-        if (Storage::exists(str_replace('storage', 'public', $chirp->images->filename))) {
-            // dd($url);
-            Storage::delete(str_replace('storage', 'public', $chirp->images->filename));
-        } else {
-            dd('Does not exist');
+        foreach ($chirp->images as $image) {
+            if (Storage::exists(str_replace('storage', 'public', $image->filename))) {
+                Storage::delete(str_replace('storage', 'public', $image->filename));
+            }
+            $image->delete();
         }
+
 
 
         $chirp->delete();
