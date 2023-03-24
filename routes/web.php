@@ -37,7 +37,8 @@ Route::resource('chirps', ChirpController::class)
 
 Route::delete('/images/{id}', function ($id) {
     $image = Image::findOrFail($id);
-    Storage::delete($image->filename);
+    // Storage::delete($image->filename);
+    Storage::delete(str_replace('storage', 'public', $image->filename));
     $image->delete();
 
     return redirect()->back()->with('success', 'Image deleted successfully');

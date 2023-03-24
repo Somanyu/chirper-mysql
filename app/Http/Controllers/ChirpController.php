@@ -49,8 +49,8 @@ class ChirpController extends Controller
         }
 
         // $request->user()->chirps()->create([
-            // 'images' => implode('|', $image),
-            // 'message' => $request->message,
+        // 'images' => implode('|', $image),
+        // 'message' => $request->message,
         // ]);
 
         $chirps = $request->user()->chirps()->create([
@@ -109,24 +109,29 @@ class ChirpController extends Controller
         // }
 
         // Save the new images to storage
-        // $image = array();
-        // if ($files = $request->file('images')) {
-        //     foreach ($files as $file) {
-        //         $image_name = md5(rand(1000, 10000));
-        //         $ext = strtolower($file->getClientOriginalExtension());
-        //         $image_fullName = $image_name . '.' . $ext;
-        //         $upload_path = 'storage/images/';
-        //         $image_url = $upload_path . $image_fullName;
-        //         $file->move($upload_path, $image_fullName);
-        //         $image[] = $image_url;
-        //     }
-        // }
+        $images = array();
+        if ($files = $request->file('images')) {
+            foreach ($files as $file) {
+                $image_name = md5(rand(1000, 10000));
+                $ext = strtolower($file->getClientOriginalExtension());
+                $image_fullName = $image_name . '.' . $ext;
+                $upload_path = 'storage/images/';
+                $image_url = $upload_path . $image_fullName;
+                $file->move($upload_path, $image_fullName);
+                $images[] = $image_url;
+            }
+        }
         // dd($image);
-
 
         $chirp->update([
             'message' => $request->message,
         ]);
+
+        foreach ($images as $image) {
+            $chirp->images()->create([
+                'filename' => $image,
+            ]);
+        };
 
         return redirect(route('chirps.index'));
     }
@@ -150,7 +155,14 @@ class ChirpController extends Controller
         //         }
         //     }
         // }
-        
+
+        if (Storage::exists(str_replace('storage', 'public', $chirp->images->filename))) {
+            // dd($url);
+            Storage::delete(str_replace('storage', 'public', $chirp->images->filename));
+        } else {
+            dd('Does not exist');
+        }
+
 
         $chirp->delete();
 
