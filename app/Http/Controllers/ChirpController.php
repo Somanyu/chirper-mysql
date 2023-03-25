@@ -48,10 +48,6 @@ class ChirpController extends Controller
             }
         }
 
-        // $request->user()->chirps()->create([
-        // 'images' => implode('|', $image),
-        // 'message' => $request->message,
-        // ]);
 
         $chirps = $request->user()->chirps()->create([
             'message' => $request->message,
@@ -94,20 +90,6 @@ class ChirpController extends Controller
     {
         $this->authorize('update', $chirp);
 
-
-        // Delete the old images from storage
-        // if ($chirp->images) {
-        //     foreach (explode('|', $chirp->images) as $image) {
-        //         $url = asset($image);
-        //         if (Storage::exists(str_replace('storage', 'public', $image))) {
-        //             // dd($url);
-        //             Storage::delete(str_replace('storage', 'public', $image));
-        //         } else {
-        //             dd('Does not exist');
-        //         }
-        //     }
-        // }
-
         // Save the new images to storage
         $images = array();
         if ($files = $request->file('images')) {
@@ -149,8 +131,6 @@ class ChirpController extends Controller
             }
             $image->delete();
         }
-
-
 
         $chirp->delete();
 

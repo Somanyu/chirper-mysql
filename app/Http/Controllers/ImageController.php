@@ -60,22 +60,18 @@ class ImageController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Image $image, $id)
+    public function destroy(Image $image)
     {
         $this->authorize('delete', $image);
-        $image = Image::findOrFail($id);
 
-        dd($id);
-
-        // Storage::delete($image->filename);
-        if (Storage::exists(str_replace('storage', 'public', $image))) {
-            // dd($url);
-            Storage::delete(str_replace('storage', 'public', $image));
+        if (Storage::exists(str_replace('storage', 'public', $image->filename))) {
+            Storage::delete(str_replace('storage', 'public', $image->filename));
         } else {
             dd('Does not exist');
         }
+    
         $image->delete();
-
+    
         return redirect()->back()->with('success', 'Image deleted successfully');
     }
 }

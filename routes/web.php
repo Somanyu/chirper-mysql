@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChirpController;
+use App\Http\Controllers\ImageController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Image;
 use Illuminate\Support\Facades\Storage;
@@ -35,14 +36,10 @@ Route::resource('chirps', ChirpController::class)
     ->only(['index', 'store', 'edit', 'update', 'destroy'])
     ->middleware(['auth', 'verified']);
 
-Route::delete('/images/{id}', function ($id) {
-    $image = Image::findOrFail($id);
-    // Storage::delete($image->filename);
-    Storage::delete(str_replace('storage', 'public', $image->filename));
-    $image->delete();
+Route::delete('/images/{image}', [ImageController::class, 'destroy'])
+    ->name('images.destroy')
+    ->middleware(['auth', 'verified']);
 
-    return redirect()->back()->with('success', 'Image deleted successfully');
-})->name('images.destroy');
 
 
 require __DIR__ . '/auth.php';
