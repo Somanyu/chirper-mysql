@@ -16,7 +16,7 @@
                 file:rounded-full file:border-0
                 file:text-sm file:font-semibold
                 file:bg-blue-50 file:text-slate-700
-                hover:file:bg-slate-300"  type="file" name="images[]" multiple/>
+                hover:file:bg-slate-300"  type="file" name="images[]" multiple accept=".jpg, .jpeg, .png, .gif, .mp3, .mp4"/>
                 <x-input-error :messages="$errors->get('image')" class="mt-2" />
             </div>
             <x-primary-button class="mt-4">{{ __('Chirp') }}</x-primary-button>
@@ -62,8 +62,16 @@
                         </div>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-5">
                             @foreach($chirp->images as $image)
-                                <img class="max-w-full h-auto rounded-lg hover:transform hover:scale-150 hover:drop-shadow-2xl" src="{{ $image->filename }}" alt="Chirp Image">
+                                @if (substr($image->filename, -4) == '.mp4')
+                                    <video class="max-w-full h-auto rounded-lg hover:transform hover:scale-150 hover:drop-shadow-2xl" autoplay loop controls>
+                                        <source src="{{ $image->filename }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                @else
+                                    <img class="max-w-full h-auto rounded-lg hover:transform hover:scale-150 hover:drop-shadow-2xl" src="{{ $image->filename }}" alt="Chirp Image">
+                                @endif
                             @endforeach
+
                         </div>
                         <p class="mt-4 text-lg text-gray-900">{{ $chirp->message }}</p>
                     </div>
