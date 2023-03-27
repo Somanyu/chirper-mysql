@@ -62,7 +62,7 @@
                         </div>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-5">
                             @foreach($chirp->images as $image)
-                                <img class="max-w-full h-auto rounded-lg" src="{{ $image->filename }}" alt="Chirp Image">
+                                <img class="max-w-full h-auto rounded-lg hover:transform hover:scale-150 hover:drop-shadow-2xl" src="{{ $image->filename }}" alt="Chirp Image">
                             @endforeach
                         </div>
                         <p class="mt-4 text-lg text-gray-900">{{ $chirp->message }}</p>
