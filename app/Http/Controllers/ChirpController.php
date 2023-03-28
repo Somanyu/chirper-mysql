@@ -44,18 +44,18 @@ class ChirpController extends Controller
                 $image_fullName = $image_name . '.' . $ext;
                 $image_upload_path = 'storage/images/';
                 $image_url = $image_upload_path . $image_fullName;
-        
+
                 // Create thumbnail
                 $thumbnail_name = $image_name . '_thumb.' . $ext;
                 $thumbnail_upload_path = 'storage/images/thumbnails/';
                 $thumbnail_url = $thumbnail_upload_path . $thumbnail_name;
                 InterImage::make($file)->fit(200, 200)->save($thumbnail_url);
-        
+
                 $file->move($image_upload_path, $image_fullName);
                 $images[] = $thumbnail_url;
             }
         }
-        
+
 
 
         $chirps = $request->user()->chirps()->create([
@@ -99,27 +99,25 @@ class ChirpController extends Controller
     {
         $this->authorize('update', $chirp);
 
-        // Save the new images to storage
         $images = array();
         if ($files = $request->file('images')) {
             foreach ($files as $file) {
                 $image_name = md5(rand(1000, 10000));
                 $ext = strtolower($file->getClientOriginalExtension());
                 $image_fullName = $image_name . '.' . $ext;
-                $upload_path = 'storage/images/';
-                $image_url = $upload_path . $image_fullName;
+                $image_upload_path = 'storage/images/';
+                $image_url = $image_upload_path . $image_fullName;
 
                 // Create thumbnail
                 $thumbnail_name = $image_name . '_thumb.' . $ext;
-                $thumbnail_url = $upload_path . $thumbnail_name;
+                $thumbnail_upload_path = 'storage/images/thumbnails/';
+                $thumbnail_url = $thumbnail_upload_path . $thumbnail_name;
                 InterImage::make($file)->fit(200, 200)->save($thumbnail_url);
 
-
-                // $file->move($upload_path, $image_fullName);
+                $file->move($image_upload_path, $image_fullName);
                 $images[] = $thumbnail_url;
             }
         }
-        // dd($image);
 
         $chirp->update([
             'message' => $request->message,
