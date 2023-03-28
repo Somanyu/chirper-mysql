@@ -9,6 +9,7 @@ use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image as InterImage;
 
 class ChirpController extends Controller
 {
@@ -43,8 +44,20 @@ class ChirpController extends Controller
                 $image_fullName = $image_name . '.' . $ext;
                 $upload_path = 'storage/images/';
                 $image_url = $upload_path . $image_fullName;
-                $file->move($upload_path, $image_fullName);
-                $images[] = $image_url;
+
+                // Create thumbnail
+                $thumbnail_name = $image_name . '_thumb.' . $ext;
+                $thumbnail_url = $upload_path . $thumbnail_name;
+                InterImage::make($file)->fit(200, 200)->save($thumbnail_url);
+
+                // Resize image
+                // InterImage::make($file)->resize(800, null, function ($constraint) {
+                //     $constraint->aspectRatio();
+                //     $constraint->upsize();
+                // })->save($image_url);
+
+                // $file->move($upload_path, $image_fullName);
+                $images[] = $thumbnail_url;
             }
         }
 
@@ -99,8 +112,15 @@ class ChirpController extends Controller
                 $image_fullName = $image_name . '.' . $ext;
                 $upload_path = 'storage/images/';
                 $image_url = $upload_path . $image_fullName;
-                $file->move($upload_path, $image_fullName);
-                $images[] = $image_url;
+
+                // Create thumbnail
+                $thumbnail_name = $image_name . '_thumb.' . $ext;
+                $thumbnail_url = $upload_path . $thumbnail_name;
+                InterImage::make($file)->fit(200, 200)->save($thumbnail_url);
+
+
+                // $file->move($upload_path, $image_fullName);
+                $images[] = $thumbnail_url;
             }
         }
         // dd($image);
