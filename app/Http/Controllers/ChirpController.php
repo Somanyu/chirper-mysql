@@ -42,24 +42,20 @@ class ChirpController extends Controller
                 $image_name = md5(rand(1000, 10000));
                 $ext = strtolower($file->getClientOriginalExtension());
                 $image_fullName = $image_name . '.' . $ext;
-                $upload_path = 'storage/images/';
-                $image_url = $upload_path . $image_fullName;
-
+                $image_upload_path = 'storage/images/';
+                $image_url = $image_upload_path . $image_fullName;
+        
                 // Create thumbnail
                 $thumbnail_name = $image_name . '_thumb.' . $ext;
-                $thumbnail_url = $upload_path . $thumbnail_name;
+                $thumbnail_upload_path = 'storage/images/thumbnails/';
+                $thumbnail_url = $thumbnail_upload_path . $thumbnail_name;
                 InterImage::make($file)->fit(200, 200)->save($thumbnail_url);
-
-                // Resize image
-                // InterImage::make($file)->resize(800, null, function ($constraint) {
-                //     $constraint->aspectRatio();
-                //     $constraint->upsize();
-                // })->save($image_url);
-
-                // $file->move($upload_path, $image_fullName);
+        
+                $file->move($image_upload_path, $image_fullName);
                 $images[] = $thumbnail_url;
             }
         }
+        
 
 
         $chirps = $request->user()->chirps()->create([
