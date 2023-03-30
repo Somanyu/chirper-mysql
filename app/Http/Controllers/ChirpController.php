@@ -39,7 +39,7 @@ class ChirpController extends Controller
     {
         $images = array();
         $thumbnails = array();
-        
+
         if ($files = $request->file('images')) {
             foreach ($files as $file) {
                 $ext = strtolower($file->getClientOriginalExtension());
@@ -47,8 +47,16 @@ class ChirpController extends Controller
                 $image_fullName = $image_name . '.' . $ext;
                 $image_upload_path = 'storage/images/';
                 $image_url = $image_upload_path . $image_fullName;
-        
-                if ($ext == 'mp4') {
+
+                if ($ext == 'mp3') {
+                    // Handle mp3 files
+                    $filename = md5(rand(1000, 10000)) . '.' . $ext;
+                    $upload_path = 'storage/mp3/';
+                    $mp3_url = $upload_path . $filename;
+                    $file->move($upload_path, $filename);
+                    $images[] = $mp3_url;
+                    $thumbnails[] = null;
+                } else if ($ext == 'mp4') {
                     // For mp4 files, simply upload the file without creating a thumbnail
                     $file->move($image_upload_path, $image_fullName);
                     $images[] = $image_url;
@@ -59,20 +67,20 @@ class ChirpController extends Controller
                     $thumbnail_upload_path = 'storage/images/thumbnails/';
                     $thumbnail_url = $thumbnail_upload_path . $thumbnail_name;
                     InterImage::make($file)->fit(200, 200)->save($thumbnail_url);
-        
+
                     $file->move($image_upload_path, $image_fullName);
                     $thumbnails[] = $thumbnail_url;
                     $images[] = $image_url;
                 }
             }
         }
-        
+
         $combined = array_combine($images, $thumbnails);
 
         $chirps = $request->user()->chirps()->create([
             'message' => $request->message,
         ]);
-        
+
         foreach ($combined as $filename => $thumbnail) {
             $imageModel = new Image([
                 'filename' => $filename,
@@ -114,7 +122,7 @@ class ChirpController extends Controller
 
         $images = array();
         $thumbnails = array();
-        
+
         if ($files = $request->file('images')) {
             foreach ($files as $file) {
                 $ext = strtolower($file->getClientOriginalExtension());
@@ -122,8 +130,16 @@ class ChirpController extends Controller
                 $image_fullName = $image_name . '.' . $ext;
                 $image_upload_path = 'storage/images/';
                 $image_url = $image_upload_path . $image_fullName;
-        
-                if ($ext == 'mp4') {
+
+                if ($ext == 'mp3') {
+                    // Handle mp3 files
+                    $filename = md5(rand(1000, 10000)) . '.' . $ext;
+                    $upload_path = 'storage/mp3/';
+                    $mp3_url = $upload_path . $filename;
+                    $file->move($upload_path, $filename);
+                    $images[] = $mp3_url;
+                    $thumbnails[] = null;
+                } else if ($ext == 'mp4') {
                     // For mp4 files, simply upload the file without creating a thumbnail
                     $file->move($image_upload_path, $image_fullName);
                     $images[] = $image_url;
@@ -134,7 +150,7 @@ class ChirpController extends Controller
                     $thumbnail_upload_path = 'storage/images/thumbnails/';
                     $thumbnail_url = $thumbnail_upload_path . $thumbnail_name;
                     InterImage::make($file)->fit(200, 200)->save($thumbnail_url);
-        
+
                     $file->move($image_upload_path, $image_fullName);
                     $thumbnails[] = $thumbnail_url;
                     $images[] = $image_url;

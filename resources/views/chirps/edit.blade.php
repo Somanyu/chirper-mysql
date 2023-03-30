@@ -9,6 +9,8 @@
                     <input type="hidden" name="image_id" value="{{ $image->id }}">
                     @if (pathinfo($image->filename, PATHINFO_EXTENSION) === 'mp4')
                         <video class="relative inline-flex items-center max-w-full h-auto rounded-lg" src="{{ asset($image->filename) }}" alt="Chirp Video" autoplay loop muted></video>
+                    @elseif(substr($image->filename, -4) == '.mp3')
+                        <audio src="{{ $image->filename }}" controls></audio>
                     @else
                         <img class="relative inline-flex items-center max-w-full h-auto rounded-lg" src="{{ asset($image->thumbnail) }}" alt="Chirp Image">
                     @endif

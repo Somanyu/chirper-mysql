@@ -67,6 +67,8 @@
                                         <source src="{{ $image->filename }}" type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
+                                @elseif(substr($image->filename, -4) == '.mp3')
+                                    <audio src="{{ $image->filename }}" controls></audio>
                                 @else
                                     <img class="max-w-full h-auto rounded-lg hover:transform hover:scale-150 hover:drop-shadow-2xl" src="{{ $image->thumbnail }}" alt="Chirp Image">
                                 @endif
