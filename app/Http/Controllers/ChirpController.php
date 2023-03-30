@@ -39,6 +39,7 @@ class ChirpController extends Controller
     {
         $images = array();
         $thumbnails = array();
+
         if ($files = $request->file('images')) {
             foreach ($files as $file) {
                 $image_name = md5(rand(1000, 10000));
@@ -47,14 +48,20 @@ class ChirpController extends Controller
                 $image_upload_path = 'storage/images/';
                 $image_url = $image_upload_path . $image_fullName;
 
-                // Create thumbnail
-                $thumbnail_name = $image_name . '_thumb.' . $ext;
-                $thumbnail_upload_path = 'storage/images/thumbnails/';
-                $thumbnail_url = $thumbnail_upload_path . $thumbnail_name;
-                InterImage::make($file)->fit(200, 200)->save($thumbnail_url);
+                // Check if the file is an mp3 or mp4
+                if ($ext === 'mp3') {
+                    // If it's an mp3, use InterImage to create a thumbnail
+                    $thumbnail_name = $image_name . '_thumb.' . $ext;
+                    $thumbnail_upload_path = 'storage/images/thumbnails/';
+                    $thumbnail_url = $thumbnail_upload_path . $thumbnail_name;
+                    InterImage::make($file)->fit(200, 200)->save($thumbnail_url);
+                    $thumbnails[] = $thumbnail_url;
+                } else if ($ext === 'mp4') {
+                    // If it's an mp4, don't create a thumbnail
+                    $thumbnails[] = null;
+                }
 
                 $file->move($image_upload_path, $image_fullName);
-                $thumbnails[] = $thumbnail_url;
                 $images[] = $image_url;
             }
         }
@@ -105,6 +112,7 @@ class ChirpController extends Controller
 
         $images = array();
         $thumbnails = array();
+
         if ($files = $request->file('images')) {
             foreach ($files as $file) {
                 $image_name = md5(rand(1000, 10000));
@@ -113,17 +121,32 @@ class ChirpController extends Controller
                 $image_upload_path = 'storage/images/';
                 $image_url = $image_upload_path . $image_fullName;
 
-                // Create thumbnail
-                $thumbnail_name = $image_name . '_thumb.' . $ext;
-                $thumbnail_upload_path = 'storage/images/thumbnails/';
-                $thumbnail_url = $thumbnail_upload_path . $thumbnail_name;
-                InterImage::make($file)->fit(200, 200)->save($thumbnail_url);
+                // Check if the file is an mp3 or mp4
+                if ($ext === 'mp3') {
+                    // If it's an mp3, use InterImage to create a thumbnail
+                    $thumbnail_name = $image_name . '_thumb.' . $ext;
+                    $thumbnail_upload_path = 'storage/images/thumbnails/';
+                    $thumbnail_url = $thumbnail_upload_path . $thumbnail_name;
+                    InterImage::make($file)->fit(200, 200)->save($thumbnail_url);
+                    $thumbnails[] = $thumbnail_url;
+                } else if ($ext === 'mp4') {
+                    // If it's an mp4, don't create a thumbnail
+                    $thumbnails[] = null;
+                }
 
                 $file->move($image_upload_path, $image_fullName);
-                $thumbnails[] = $thumbnail_url;
                 $images[] = $image_url;
             }
         }
+
+        // Add null values to the $thumbnails array for any missing elements
+        $count_diff = count($images) - count($thumbnails);
+        if ($count_diff > 0) {
+            for ($i = 0; $i < $count_diff; $i++) {
+                $thumbnails[] = null;
+            }
+        }
+        
         $combined = array_combine($images, $thumbnails);
 
         $chirp->update([
