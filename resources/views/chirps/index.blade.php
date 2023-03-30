@@ -68,7 +68,7 @@
                                         Your browser does not support the video tag.
                                     </video>
                                 @else
-                                    <img class="max-w-full h-auto rounded-lg hover:transform hover:scale-150 hover:drop-shadow-2xl" src="{{ $image->filename }}" alt="Chirp Image">
+                                    <img class="max-w-full h-auto rounded-lg hover:transform hover:scale-150 hover:drop-shadow-2xl" src="{{ $image->thumbnail }}" alt="Chirp Image">
                                 @endif
                             @endforeach
 

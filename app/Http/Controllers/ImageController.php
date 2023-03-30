@@ -66,6 +66,7 @@ class ImageController extends Controller
 
         if (Storage::exists(str_replace('storage', 'public', $image->filename))) {
             Storage::delete(str_replace('storage', 'public', $image->filename));
+            Storage::delete(str_replace('storage', 'public', $image->thumbnail));
         } else {
             dd('Does not exist');
         }

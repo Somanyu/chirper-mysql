@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image as InterImage;
+use Illuminate\Support\Facades\DB;
 
 class ChirpController extends Controller
 {
@@ -37,6 +38,7 @@ class ChirpController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $images = array();
+        $thumbnails = array();
         if ($files = $request->file('images')) {
             foreach ($files as $file) {
                 $image_name = md5(rand(1000, 10000));
@@ -52,21 +54,23 @@ class ChirpController extends Controller
                 InterImage::make($file)->fit(200, 200)->save($thumbnail_url);
 
                 $file->move($image_upload_path, $image_fullName);
-                $images[] = $thumbnail_url;
+                $thumbnails[] = $thumbnail_url;
+                $images[] = $image_url;
             }
         }
-
-
+        $combined = array_combine($images, $thumbnails);
 
         $chirps = $request->user()->chirps()->create([
             'message' => $request->message,
         ]);
 
-        foreach ($images as $image) {
-            $chirps->images()->create([
-                'filename' => $image,
+        foreach ($combined as $filename => $thumbnail) {
+            $imageModel = new Image([
+                'filename' => $filename,
+                'thumbnail' => $thumbnail,
             ]);
-        };
+            $chirps->images()->save($imageModel);
+        }
 
 
         return redirect(route('chirps.index'));
@@ -100,6 +104,7 @@ class ChirpController extends Controller
         $this->authorize('update', $chirp);
 
         $images = array();
+        $thumbnails = array();
         if ($files = $request->file('images')) {
             foreach ($files as $file) {
                 $image_name = md5(rand(1000, 10000));
@@ -115,19 +120,23 @@ class ChirpController extends Controller
                 InterImage::make($file)->fit(200, 200)->save($thumbnail_url);
 
                 $file->move($image_upload_path, $image_fullName);
-                $images[] = $thumbnail_url;
+                $thumbnails[] = $thumbnail_url;
+                $images[] = $image_url;
             }
         }
+        $combined = array_combine($images, $thumbnails);
 
         $chirp->update([
             'message' => $request->message,
         ]);
 
-        foreach ($images as $image) {
-            $chirp->images()->create([
-                'filename' => $image,
+        foreach ($combined as $filename => $thumbnail) {
+            $imageModel = new Image([
+                'filename' => $filename,
+                'thumbnail' => $thumbnail,
             ]);
-        };
+            $chirp->images()->save($imageModel);
+        }
 
         return redirect(route('chirps.index'));
     }
@@ -142,6 +151,7 @@ class ChirpController extends Controller
         foreach ($chirp->images as $image) {
             if (Storage::exists(str_replace('storage', 'public', $image->filename))) {
                 Storage::delete(str_replace('storage', 'public', $image->filename));
+                Storage::delete(str_replace('storage', 'public', $image->thumbnail));
             }
             $image->delete();
         }
