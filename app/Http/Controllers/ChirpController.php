@@ -10,7 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image as InterImage;
-use Illuminate\Support\Facades\DB;
+use Aws\S3\S3Client;
 
 class ChirpController extends Controller
 {
@@ -41,6 +41,16 @@ class ChirpController extends Controller
         $thumbnails = array();
 
         if ($files = $request->file('images')) {
+
+            $S3 = new S3Client([
+                'version' => 'latest',
+                'region' => config('filesystems.disks.s3.region'),
+                'credentials' => [
+                    'key' => config('filesystems.disks.s3.key'),
+                    'secret' => config('filesystems.disks.s3.secret')
+                ],
+            ]);
+
             foreach ($files as $file) {
                 $ext = strtolower($file->getClientOriginalExtension());
                 $image_name = md5(rand(1000, 10000));
@@ -54,11 +64,26 @@ class ChirpController extends Controller
                     $upload_path = 'storage/mp3/';
                     $mp3_url = $upload_path . $filename;
                     $file->move($upload_path, $filename);
+
+                    $result = $S3->putObject([
+                        'Bucket' => config('filesystems.disks.s3.bucket'),
+                        'Key' => $mp3_url,
+                        'Body' => fopen(public_path($mp3_url), 'r')
+                        
+                    ]);
+
                     $images[] = $mp3_url;
                     $thumbnails[] = null;
                 } else if ($ext == 'mp4') {
                     // For mp4 files, simply upload the file without creating a thumbnail
                     $file->move($image_upload_path, $image_fullName);
+
+                    $result = $S3->putObject([
+                        'Bucket' => config('filesystems.disks.s3.bucket'),
+                        'Key' => $image_url,
+                        'Body' => fopen(public_path($image_url), 'r')
+                    ]);
+
                     $images[] = $image_url;
                     $thumbnails[] = null;
                 } else {
@@ -69,6 +94,14 @@ class ChirpController extends Controller
                     InterImage::make($file)->fit(200, 200)->save($thumbnail_url);
 
                     $file->move($image_upload_path, $image_fullName);
+                    
+                    $result = $S3->putObject([
+                        'Bucket' => config('filesystems.disks.s3.bucket'),
+                        'Key' => $image_url,
+                        'Body' => fopen(public_path($image_url), 'r')
+                        
+                    ]);
+
                     $thumbnails[] = $thumbnail_url;
                     $images[] = $image_url;
                 }
